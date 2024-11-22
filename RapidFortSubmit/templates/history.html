@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}History{% endblock %}
+
+{% block content %}
+<h1>Your Conversion History</h1>
+{% if history %}
+    <ul>
+        {% for item in history %}
+            <li>
+                <strong>{{ item.original_file_name }}</strong>
+                - <a href="{{ item.converted_file_path }}" download>Download PDF</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no conversion history.</p>
+{% endif %}
+{% endblock %}

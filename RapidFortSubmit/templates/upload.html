@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload File{% endblock %}
+
+{% block content %}
+<h1>Upload a .docx File</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="doc_file" required>
+    <button type="submit">Upload</button>
+</form>
+{% endblock %}

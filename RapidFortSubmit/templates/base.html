@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}My Application{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .links a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        nav .links a:hover {
+            color: #ff6347;
+        }
+
+        nav h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ff6347;
+        }
+
+        button, input[type="file"] {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #444;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #ff6347;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>DOCX to PDF Converter</h1>
+        <div class="links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'upload' %}">Upload</a>
+                <a href="{% url 'history' %}">History</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
