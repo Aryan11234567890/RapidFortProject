@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y \
     libreoffice-writer \
     fonts-liberation \
     && apt-get clean
-
+RUN apt-get install libpq-dev -y
 WORKDIR /app
 
 COPY requirements.txt .
