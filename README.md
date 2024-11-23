@@ -1,3 +1,5 @@
+- Link to deployed Project: http://52.66.46.92:8080/
+
 - RapidFort Campus Drive Internship Project Submission
 
 - Name: Aryan Shanker Saxena
