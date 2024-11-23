@@ -9,7 +9,8 @@
         {% for item in history %}
             <li>
                 <strong>{{ item.original_file_name }}</strong>
-                - <a href="{{ item.converted_file_path }}" download>Download PDF</a>
+                {% comment %} - <a href="{{ item.converted_file_path }}" download>Download PDF</a> {% endcomment %}
+                - <a href="{% url 'download' item.id %}">Download PDF</a>
             </li>
         {% endfor %}
     </ul>

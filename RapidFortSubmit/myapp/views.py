@@ -54,8 +54,14 @@ def upload(request):
         fs = FileSystemStorage()
         file_name = fs.save(sanitized_name, doc_file)
         file_path = fs.path(file_name)
-        encrypt_pdf = request.POST.get('encrypt_pdf')
-        password = request.POST.get('password') if encrypt_pdf else None
+
+        # Get the value of encrypt_pdf and password
+        encrypt_pdf = request.POST.get('encrypt_pdf')  # This will be 'on' if checked, None if not
+        password = request.POST.get('password') if encrypt_pdf == 'on' else None  # Only get password if checkbox is checked
+
+        # Log the values of encrypt_pdf and password to debug
+        logging.info(f"Form data: encrypt_pdf={encrypt_pdf}, password={password}")
+
         uploaded_file = UploadedFile.objects.create(
             user=request.user,
             original_file_name=doc_file.name,
@@ -65,6 +71,8 @@ def upload(request):
         return redirect('convert', file_id=uploaded_file.id, password=password)
     
     return render(request, 'upload.html')
+
+
 import logging
 
 @login_required
@@ -120,11 +128,21 @@ def download(request, file_id):
         uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
     except UploadedFile.DoesNotExist:
         return render(request, 'error.html', {'message': 'File not found'})
-    
-    if not uploaded_file.converted_file_path or not os.path.exists(uploaded_file.converted_file_path):
-        return render(request, 'error.html', {'message': 'PDF not found'})
 
-    return FileResponse(open(uploaded_file.converted_file_path, 'rb'), as_attachment=True, filename=os.path.basename(uploaded_file.converted_file_path))
+    if not os.path.exists(uploaded_file.converted_file_path):
+        logging.error(f"File not found at: {uploaded_file.converted_file_path}")
+        return render(request, 'error.html', {'message': 'Converted PDF not found'})
+
+    try:
+        return FileResponse(
+            open(uploaded_file.converted_file_path, 'rb'),
+            as_attachment=True,
+            filename=os.path.basename(uploaded_file.converted_file_path),
+        )
+    except Exception as e:
+        logging.error(f"Error while serving file: {e}")
+        return render(request, 'error.html', {'message': f'Error serving file: {str(e)}'})
+
 
 @login_required
 def history(request):

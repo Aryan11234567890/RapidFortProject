@@ -7,7 +7,9 @@ class UploadedFile(models.Model):
     original_file_name = models.CharField(max_length=255)
     uploaded_file_path = models.TextField()
     converted_file_path = models.TextField()
-    upload_date = models.DateTimeField(auto_now_add=True)
+    docx_metadata = models.JSONField(null=True, blank=True)
+    pdf_metadata = models.JSONField(null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
 class ConversionHistory(models.Model):
