@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Metadata{% endblock %}
+
+{% block content %}
+<h1>File Metadata</h1>
+<div style="display: flex; gap: 20px;">
+    <div>
+        <h2>DOCX Metadata</h2>
+        <table border="1">
+            {% for key, value in docx_metadata.items %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div>
+        <h2>PDF Metadata</h2>
+        <table border="1">
+            {% for key, value in pdf_metadata.items %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

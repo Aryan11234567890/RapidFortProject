@@ -41,12 +41,18 @@ def user_logout(request):
     logout(request)
     return redirect('login')
 
+import re
+
+def sanitize_filename(filename):
+    return re.sub(r'[^\w\s.-]', '_', filename)
+
 @login_required
 def upload(request):
     if request.method == 'POST' and request.FILES.get('doc_file'):
         doc_file = request.FILES['doc_file']
+        sanitized_name = sanitize_filename(doc_file.name)
         fs = FileSystemStorage()
-        file_name = fs.save(doc_file.name, doc_file)
+        file_name = fs.save(sanitized_name, doc_file)
         file_path = fs.path(file_name)
         encrypt_pdf = request.POST.get('encrypt_pdf')
         password = request.POST.get('password') if encrypt_pdf else None
@@ -59,7 +65,8 @@ def upload(request):
         return redirect('convert', file_id=uploaded_file.id, password=password)
     
     return render(request, 'upload.html')
-import pythoncom
+import logging
+
 @login_required
 def cvt(request, file_id, password=None):
     uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
@@ -70,13 +77,17 @@ def cvt(request, file_id, password=None):
     pdf_file_path = uploaded_file.uploaded_file_path.replace('.docx', '.pdf')
 
     try:
-        pythoncom.CoInitialize()
-        convert(uploaded_file.uploaded_file_path, pdf_file_path)
-        if password:
-            encrypt_pdf(pdf_file_path, password)
+        # Convert DOCX to PDF
+        generate_pdf(uploaded_file.uploaded_file_path, pdf_file_path, password)
 
-    finally:
-        pythoncom.CoUninitialize()
+        # Confirm the PDF exists
+        if not os.path.exists(pdf_file_path):
+            logging.error(f"PDF file not created: {pdf_file_path}")
+            return render(request, 'error.html', {'message': 'PDF conversion failed'})
+
+    except subprocess.CalledProcessError as e:
+        logging.error(f"LibreOffice error: {str(e)}")
+        return render(request, 'error.html', {'message': f'Conversion error: {str(e)}'})
 
     ConversionHistory.objects.create(
         user=request.user,
@@ -122,24 +133,22 @@ def history(request):
 
     return render(request, 'history.html', {'history': history})
 
-from docx2pdf import convert
+import subprocess
+
 def generate_pdf(input_path, output_path, password=None):
-    pythoncom.CoInitialize()  
-
-    convert(input_path, output_path)
-
+    command = [
+        "soffice",
+        "--headless",
+        "--convert-to",
+        "pdf",
+        "--outdir",
+        os.path.dirname(output_path),
+        input_path,
+    ]
+    result = subprocess.run(command, check=True)
+    if os.path.exists(output_path):
+        print(f"PDF created successfully: {output_path}")
+    else:
+        print(f"PDF creation failed: {output_path}")
     if password:
-        from PyPDF2 import PdfWriter, PdfReader
-        with open(output_path, 'rb') as original_pdf:
-            reader = PdfReader(original_pdf)
-            writer = PdfWriter()
-
-            for page in reader.pages:
-                writer.add_page(page)
-
-
-            writer.encrypt(password)
-
-
-            with open(output_path, 'wb') as encrypted_pdf:
-                writer.write(encrypted_pdf)
+        encrypt_pdf(output_path, password)
