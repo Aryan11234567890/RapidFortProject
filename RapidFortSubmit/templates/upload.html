@@ -4,9 +4,25 @@
 
 {% block content %}
 <h1>Upload a .docx File</h1>
-<form method="post" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+    {{ form.as_p }}
+    <label for="doc_file">Upload DOCX File</label>
     <input type="file" name="doc_file" required>
+    
+    <div>
+        <label for="password">Encrypt PDF (Optional):</label>
+        <input type="checkbox" name="encrypt_pdf" id="encrypt_pdf">
+        <input type="password" name="password" id="password" placeholder="Enter password" style="display:none;">
+    </div>
+
     <button type="submit">Upload</button>
 </form>
+
+<script>
+    document.getElementById('encrypt_pdf').addEventListener('change', function() {
+        const passwordField = document.getElementById('password');
+        passwordField.style.display = this.checked ? 'block' : 'none';
+    });
+</script>
 {% endblock %}
