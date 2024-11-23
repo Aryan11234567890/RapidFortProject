@@ -7,7 +7,8 @@
 - College: Thapar Institute of Engineering and Technology
 - Batch: 2025 (Final-year Student)
 
-- Tech Stack: Python (Django), PostgreSQL (AIVEN), AWS (Cloud), HTML/CSS/JavaScript
+- Tech Stack: Python (Django), PostgreSQL (AIVEN), AWS (Cloud), HTML/CSS/JavaScript, Docker
+- Password protection implemented
 
 - Project: Converting file types such as .docx to .pdf.
 
