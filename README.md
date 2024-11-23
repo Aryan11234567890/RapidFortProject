@@ -6,4 +6,4 @@
 
 - Project: Converting file types such as .docx to .pdf.
 
-- 
+- High-level design (HLD) attached above for more in-depth insights.
